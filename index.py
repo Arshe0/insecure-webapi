@@ -4,9 +4,10 @@ import hashlib
 import mysql.connector
 import base64
 import shutil
+import os
 from datetime import datetime
 from pathlib import Path
-from bottle import route, run, template, post, request, static_file
+from bottle import route, run, template, post, get, request, static_file
 
 
 
@@ -38,6 +39,12 @@ def getToken():
 	m.update(cadena.encode())
 	Q = m.hexdigest()
 	return f"{P[:20]}{Q[20:]}"
+
+
+@get('/')
+def index():
+	return {"status": "ok", "server": "insecure-webapi", "version": "1.0"}
+
 
 """
 */ 
@@ -295,4 +302,4 @@ def Descargar():
 	return static_file(R[0][1],Path(".").resolve())
 
 if __name__ == '__main__':
-    run(host='localhost', port=8080, debug=True)
+	run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)), debug=False)
