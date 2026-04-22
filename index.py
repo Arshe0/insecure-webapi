@@ -1,3 +1,4 @@
+import os
 import json
 import random
 import hashlib
@@ -295,4 +296,4 @@ def Descargar():
 	return static_file(R[0][1],Path(".").resolve())
 
 if __name__ == '__main__':
-    run(host='localhost', port=8080, debug=True)
+    run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)), debug=False)
