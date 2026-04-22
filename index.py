@@ -303,8 +303,4 @@ def Descargar():
 	return static_file(R[0][1],Path(".").resolve())
 
 if __name__ == '__main__':
-<<<<<<< HEAD
 	run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)), debug=False)
-=======
-    run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)), debug=False)
->>>>>>> 47f3817a34eb4615dab4bbf93b4245c0962a71b9
