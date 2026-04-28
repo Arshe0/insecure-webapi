@@ -5,6 +5,7 @@ import mysql.connector
 import base64
 import shutil
 import os
+import bcrypt  # VUL-002: reemplaza md5 por bcrypt
 from datetime import datetime
 from pathlib import Path
 from bottle import route, run, template, post, get, request, static_file
@@ -55,10 +56,12 @@ def Registro():
     R = False
     try:
         with db.cursor() as cursor:
+            # VUL-002: bcrypt en lugar de md5 para hashear la contraseña
+            hashed = bcrypt.hashpw(request.json["password"].encode(), bcrypt.gensalt()).decode()
             # VUL-001: consulta parametrizada para evitar SQL Injection
             cursor.execute(
-                'INSERT INTO Usuario VALUES(null, %s, %s, md5(%s))',
-                (request.json["uname"], request.json["email"], request.json["password"])
+                'INSERT INTO Usuario VALUES(null, %s, %s, %s)',
+                (request.json["uname"], request.json["email"], hashed)
             )
             R = cursor.lastrowid
             db.commit()
@@ -87,9 +90,10 @@ def Login():
     try:
         with db.cursor() as cursor:
             # VUL-001: consulta parametrizada para evitar SQL Injection
+            # VUL-002: se obtiene el hash para verificarlo con bcrypt
             cursor.execute(
-                'SELECT id FROM Usuario WHERE uname = %s AND password = md5(%s)',
-                (request.json["uname"], request.json["password"])
+                'SELECT id, password FROM Usuario WHERE uname = %s',
+                (request.json["uname"],)
             )
             R = cursor.fetchall()
     except Exception as e:
@@ -98,6 +102,11 @@ def Login():
         return {"R": -2}
 
     if not R:
+        db.close()
+        return {"R": -3}
+
+    # VUL-002: verificar contraseña con bcrypt en lugar de md5
+    if not bcrypt.checkpw(request.json["password"].encode(), R[0][1].encode()):
         db.close()
         return {"R": -3}
 
