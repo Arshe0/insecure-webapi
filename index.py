@@ -144,6 +144,11 @@ def Imagen():
     if not R:
         return {"R": -1}
 
+    # VUL-004: validar extension contra lista blanca para evitar path traversal
+    EXTENSIONES_PERMITIDAS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+    if request.json['ext'].lower() not in EXTENSIONES_PERMITIDAS:
+        return {"R": -1}
+
     dbcnf = loadDatabaseSettings('db.json')
     db = mysql.connector.connect(
         host='localhost', port=dbcnf['port'],
@@ -181,6 +186,7 @@ def Imagen():
             )
             R = cursor.fetchall()
             idImagen = R[0][0]
+            # VUL-004: extension ya validada contra lista blanca, segura para usar en ruta
             nueva_ruta = f'img/{idImagen}.{request.json["ext"]}'
             cursor.execute('UPDATE Imagen SET ruta = %s WHERE id = %s', (nueva_ruta, idImagen))
             db.commit()
