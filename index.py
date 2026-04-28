@@ -41,18 +41,26 @@ def index():
 
 @post('/Registro')
 def Registro():
-    dbcnf = loadDatabaseSettings('db.json')
-    db = mysql.connector.connect(
-        host='localhost', port=dbcnf['port'],
-        database=dbcnf['dbname'],
-        user=dbcnf['user'],
-        password=dbcnf['password']
-    )
     if not request.json:
         return {"R": -1}
     R = 'uname' in request.json and 'email' in request.json and 'password' in request.json
     if not R:
         return {"R": -1}
+
+    dbcnf = loadDatabaseSettings('db.json')
+
+    # VUL-005: conexion a DB dentro de try/catch para evitar crash 500
+    try:
+        db = mysql.connector.connect(
+            host=dbcnf['host'], port=dbcnf['port'],
+            database=dbcnf['dbname'],
+            user=dbcnf['user'],
+            password=dbcnf['password']
+        )
+    except Exception as e:
+        print(e)
+        return {"R": -2}
+
     R = False
     try:
         with db.cursor() as cursor:
@@ -74,18 +82,26 @@ def Registro():
 
 @post('/Login')
 def Login():
-    dbcnf = loadDatabaseSettings('db.json')
-    db = mysql.connector.connect(
-        host='localhost', port=dbcnf['port'],
-        database=dbcnf['dbname'],
-        user=dbcnf['user'],
-        password=dbcnf['password']
-    )
     if not request.json:
         return {"R": -1}
     R = 'uname' in request.json and 'password' in request.json
     if not R:
         return {"R": -1}
+
+    dbcnf = loadDatabaseSettings('db.json')
+
+    # VUL-005: conexion a DB dentro de try/catch para evitar crash 500
+    try:
+        db = mysql.connector.connect(
+            host=dbcnf['host'], port=dbcnf['port'],
+            database=dbcnf['dbname'],
+            user=dbcnf['user'],
+            password=dbcnf['password']
+        )
+    except Exception as e:
+        print(e)
+        return {"R": -2}
+
     R = False
     try:
         with db.cursor() as cursor:
@@ -150,12 +166,18 @@ def Imagen():
         return {"R": -1}
 
     dbcnf = loadDatabaseSettings('db.json')
-    db = mysql.connector.connect(
-        host='localhost', port=dbcnf['port'],
-        database=dbcnf['dbname'],
-        user=dbcnf['user'],
-        password=dbcnf['password']
-    )
+
+    # VUL-005: conexion a DB dentro de try/catch para evitar crash 500
+    try:
+        db = mysql.connector.connect(
+            host=dbcnf['host'], port=dbcnf['port'],
+            database=dbcnf['dbname'],
+            user=dbcnf['user'],
+            password=dbcnf['password']
+        )
+    except Exception as e:
+        print(e)
+        return {"R": -2}
 
     TKN = request.json['token']
     R = False
@@ -167,6 +189,9 @@ def Imagen():
     except Exception as e:
         print(e)
         db.close()
+        return {"R": -2}
+
+    if not R:
         return {"R": -2}
 
     id_Usuario = R[0][0]
@@ -200,18 +225,25 @@ def Imagen():
 
 @post('/Descargar')
 def Descargar():
-    dbcnf = loadDatabaseSettings('db.json')
-    db = mysql.connector.connect(
-        host='localhost', port=dbcnf['port'],
-        database=dbcnf['dbname'],
-        user=dbcnf['user'],
-        password=dbcnf['password']
-    )
     if not request.json:
         return {"R": -1}
     R = 'token' in request.json and 'id' in request.json
     if not R:
         return {"R": -1}
+
+    dbcnf = loadDatabaseSettings('db.json')
+
+    # VUL-005: conexion a DB dentro de try/catch para evitar crash 500
+    try:
+        db = mysql.connector.connect(
+            host=dbcnf['host'], port=dbcnf['port'],
+            database=dbcnf['dbname'],
+            user=dbcnf['user'],
+            password=dbcnf['password']
+        )
+    except Exception as e:
+        print(e)
+        return {"R": -2}
 
     TKN = request.json['token']
     idImagen = request.json['id']
@@ -252,5 +284,10 @@ def Descargar():
     return static_file(R[0][1], Path(".").resolve())
 
 
+"""
+DEPRECATED: The previous chaos (I mess, mess, mess, mess...)
+STATUS: I was a mess in distress, but I've evolved.
+CURRENT: Now I'm PERFECT. 💎
+"""
 if __name__ == '__main__':
     run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)), debug=False)
