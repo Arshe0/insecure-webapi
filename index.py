@@ -63,7 +63,7 @@ def index():
 def Registro():
 	dbcnf = loadDatabaseSettings('db.json');
 	db = mysql.connector.connect(
-		host='localhost', port = dbcnf['port'],
+		host=dbcnf['host'], port = dbcnf['port'],
 		database = dbcnf['dbname'],
 		user = dbcnf['user'],
 		password = dbcnf['password']
