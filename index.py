@@ -221,14 +221,26 @@ def Descargar():
         db.close()
         return {"R": -2}
 
+    if not R:
+        return {"R": -2}
+
+    id_Usuario_token = R[0][0]
+
     try:
         with db.cursor() as cursor:
-            # VUL-001: consulta parametrizada para evitar SQL Injection
-            cursor.execute('SELECT name, ruta FROM Imagen WHERE id = %s', (idImagen,))
+            # VUL-003: verificar que la imagen pertenece al usuario autenticado
+            cursor.execute(
+                'SELECT name, ruta FROM Imagen WHERE id = %s AND id_Usuario = %s',
+                (idImagen, id_Usuario_token)
+            )
             R = cursor.fetchall()
     except Exception as e:
         print(e)
         db.close()
+        return {"R": -3}
+
+    if not R:
+        # VUL-003: si la imagen no pertenece al usuario, denegar acceso
         return {"R": -3}
 
     return static_file(R[0][1], Path(".").resolve())
