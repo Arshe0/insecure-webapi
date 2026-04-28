@@ -109,7 +109,7 @@ def Registro():
 def Login():
 	dbcnf = loadDatabaseSettings('db.json');
 	db = mysql.connector.connect(
-		host='localhost', port = dbcnf['port'],
+		host=dbcnf['host'], port = dbcnf['port'],
 		database = dbcnf['dbname'],
 		user = dbcnf['user'],
 		password = dbcnf['password']
@@ -195,7 +195,7 @@ def Imagen():
 	
 	dbcnf = loadDatabaseSettings('db.json');
 	db = mysql.connector.connect(
-		host='localhost', port = dbcnf['port'],
+		host=dbcnf['host'], port = dbcnf['port'],
 		database = dbcnf['dbname'],
 		user = dbcnf['user'],
 		password = dbcnf['password']
@@ -255,7 +255,7 @@ def Imagen():
 def Descargar():
 	dbcnf = loadDatabaseSettings('db.json');
 	db = mysql.connector.connect(
-		host='localhost', port = dbcnf['port'],
+		 host=dbcnf['host'], port = dbcnf['port'],
 		database = dbcnf['dbname'],
 		user = dbcnf['user'],
 		password = dbcnf['password']
